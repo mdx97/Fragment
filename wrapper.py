@@ -9,6 +9,7 @@ class SpotifyWrapper:
         self.config = Config()
         self.access_token = ""
         self.user = ""
+        self.playlist_id = ""
 
     def authorize(self):
         # Request Spotify username.
@@ -34,6 +35,7 @@ class SpotifyWrapper:
 
         for pl in playlists:
             if pl["name"] == "fragment-auto":
+                self.playlist_id = pl["id"]
                 playlist_exists = True
                 break
         
@@ -43,13 +45,27 @@ class SpotifyWrapper:
             data = {"name": "fragment-auto", "description": "Automatically generated playlist for Fragment."}
             headers = self._get_standard_headers()
             headers["Content-Type"] = "application/json"
-            requests.post(url, data=json.dumps(data), headers=headers)
+            response = requests.post(url, data=json.dumps(data), headers=headers)
+            self.playlist_id = response["id"]
 
     def get_playlists(self):
         url = "https://api.spotify.com/v1/users/{}/playlists".format(self.user)
         headers = self._get_standard_headers()
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["items"]
+
+    def get_playlist_tracks(self, id):
+        url = "https://api.spotify.com/v1/playlists/{}".format(id)
+        headers = self._get_standard_headers()
+        response = requests.get(url, headers=headers)
+        return json.loads(response.text)["tracks"]["items"]
+    
+    def add_track(self, uri):
+        url = "https://api.spotify.com/v1/playlists/{}/tracks".format(self.playlist_id)
+        headers = self._get_standard_headers()
+        headers["Content-Type"] = "application/json"
+        data = {"uris": [uri]}
+        requests.post(url, data=json.dumps(data), headers=headers)
 
     def _get_standard_headers(self):
         return {"Authorization": "Bearer {}".format(self.access_token)}
