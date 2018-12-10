@@ -28,16 +28,10 @@ class SpotifyWrapper:
         self.access_token = response_data["access_token"]
 
     def create_playlist(self):
-        # Common data between requests.
-        url = "https://api.spotify.com/v1/users/{}/playlists".format(self.user)
-        headers = self._get_standard_headers()
-
-        # Get a list of the user's playlists.
-        response = requests.get(url, headers=headers)
-        playlists = json.loads(response.text)["items"]
+        # Check if fragment-auto playlist exists.
+        playlists = self.get_playlists()
         playlist_exists = False
 
-        # Check if fragment-auto playlist exists.
         for pl in playlists:
             if pl["name"] == "fragment-auto":
                 playlist_exists = True
@@ -45,9 +39,17 @@ class SpotifyWrapper:
         
         # Create fragment-auto playlists if it does not exist.
         if not playlist_exists:
+            url = "https://api.spotify.com/v1/users/{}/playlists".format(self.user)
             data = {"name": "fragment-auto", "description": "Automatically generated playlist for Fragment."}
+            headers = self._get_standard_headers()
             headers["Content-Type"] = "application/json"
             requests.post(url, data=json.dumps(data), headers=headers)
+
+    def get_playlists(self):
+        url = "https://api.spotify.com/v1/users/{}/playlists".format(self.user)
+        headers = self._get_standard_headers()
+        response = requests.get(url, headers=headers)
+        return json.loads(response.text)["items"]
 
     def _get_standard_headers(self):
         return {"Authorization": "Bearer {}".format(self.access_token)}
