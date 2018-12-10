@@ -1,4 +1,5 @@
-from fragment import wrapper
+from fragment import wrapper, util
+import sys
 import math
 import random
 
@@ -6,34 +7,33 @@ w = wrapper.SpotifyWrapper()
 w.create_playlist()
 
 # Get the playlist names that will be a part of the session.
-print("-----------------------------------------")
-print("* Please enter the playlists you wish to be a part of this session.")
-print("* To complete entering playlists, type 'done'.")
-
+util.wrap_with_seperators(" Please enter the playlists you wish to be a part of this session.\n to finish entering playlists, press Enter.")
 playlists = []
 
 while (1):
-    playlist = input()
-    if playlist == "done":
+    playlist = input(" ")
+    if playlist == "":
         break
     playlists.append(playlist)
 
 playlist_count = len(playlists)
 
 # Get the total number of songs for this session.
-print("-----------------------------------------")
-print("* Please enter the number of songs for this session.")
-
-song_count = input()
+util.print_seperator()
+song_count = input(" Number of songs for this session: ")
 
 # Get the percentage each playlist will represent.
-print("-----------------------------------------")
-print("* For each playlist, please assign a percentage to each.")
-
+util.wrap_with_seperators(" Assign a percentage to each playlist.")
 percentages = [0 for x in range(playlist_count)]
-for i in range(playlist_count):
-    percentages[i] = int(input("{}: ".format(playlists[i])))
 
+for i in range(playlist_count):
+    percentages[i] = int(input(" {}: ".format(playlists[i])))
+
+if (sum(percentages) != 100):
+    util.print_seperator()
+    print(" Error: your sum of percentages does not add up to 100.")
+    sys.exit(1)
+    
 # Calculate the number of songs per playlist.
 songs_per = [0 for x in range(playlist_count)]
 for i in range(playlist_count):
