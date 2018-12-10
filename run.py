@@ -54,13 +54,18 @@ session_track_uris = []
 
 for i in range(playlist_count):
     id = playlist_ids[i]
-    if id != "0":
-        tracks = w.get_playlist_tracks(id)
-        for j in range(songs_per[i]):
+    if id == "0":
+        print("No playlist id found for '{}'!".format(playlists[i]))
+        continue
+    tracks = w.get_playlist_tracks(id)
+    for j in range(songs_per[i]):
+        if len(tracks) > 1:
             random_index = random.randint(0, len(tracks) - 1)
             session_track_uris.append(tracks[random_index]["track"]["uri"])
             del tracks[random_index]
 
 for track_uri in session_track_uris:
     w.add_track(track_uri)
+
+w.play_playlist()
 

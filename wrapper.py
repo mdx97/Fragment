@@ -46,7 +46,7 @@ class SpotifyWrapper:
             headers = self._get_standard_headers()
             headers["Content-Type"] = "application/json"
             response = requests.post(url, data=json.dumps(data), headers=headers)
-            self.playlist_id = response["id"]
+            self.playlist_id = json.loads(response.text)["id"]
 
     def get_playlists(self):
         url = "https://api.spotify.com/v1/users/{}/playlists".format(self.user)
@@ -66,6 +66,12 @@ class SpotifyWrapper:
         headers["Content-Type"] = "application/json"
         data = {"uris": [uri]}
         requests.post(url, data=json.dumps(data), headers=headers)
+
+    def play_playlist(self):
+        url = "https://api.spotify.com/v1/me/player/play"
+        headers = self._get_standard_headers()
+        data = {"context_uri": "spotify:playlist:{}".format(self.playlist_id)}
+        requests.put(url, data=json.dumps(data), headers=headers)
 
     def _get_standard_headers(self):
         return {"Authorization": "Bearer {}".format(self.access_token)}
