@@ -1,9 +1,8 @@
-from wrapper import SpotifyWrapper
+from fragment import wrapper
 import math
 import random
 
-w = SpotifyWrapper()
-w.authorize()
+w = wrapper.SpotifyWrapper()
 w.create_playlist()
 
 # Get the playlist names that will be a part of the session.
