@@ -16,6 +16,16 @@ def run_gui():
     # Set up listbox for playlist selection.
     playlist_listbox = Listbox(root)
     playlist_listbox.pack()
+    spotify_playlists = w.get_playlists()
+
+    for playlist in spotify_playlists:
+        name = playlist["name"]
+        if name != "fragment-auto":
+            playlist_listbox.insert(END, name)
+
+    # Set up button to add playlists to the session.
+    add_button = Button(root, text="Add Playlist")
+    add_button.pack()
 
     # Display window.
     root.mainloop()
