@@ -12,6 +12,10 @@ def run_gui():
     root = Tk()
     root.title("Fragment")
     root.geometry("500x300")
+    
+    # Set up listbox for playlist selection.
+    playlist_listbox = Listbox(root)
+    playlist_listbox.pack()
 
     # Display window.
     root.mainloop()
