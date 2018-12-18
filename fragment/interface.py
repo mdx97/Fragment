@@ -2,6 +2,19 @@ from fragment import wrapper, util
 import sys
 import math
 import random
+from tkinter import *
+
+def run_gui():
+    w = wrapper.SpotifyWrapper()
+    w.create_playlist()
+
+    # Create tkinter window.
+    root = Tk()
+    root.title("Fragment")
+    root.geometry("500x300")
+
+    # Display window.
+    root.mainloop()
 
 def run_cli():
     w = wrapper.SpotifyWrapper()
@@ -18,6 +31,10 @@ def run_cli():
         playlists.append(playlist)
 
     playlist_count = len(playlists)
+
+    if playlist_count == 0:
+        print(" You must enter at least one playlist!")
+        exit(1)
 
     # Get the total number of songs for this session.
     util.print_seperator()
