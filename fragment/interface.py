@@ -39,7 +39,7 @@ class FragmentCLI:
     def save_settings(self):
         preset_name = input("Please enter a name for this preset: ")
         if self.session.preset_exists(preset_name):
-            override = input("A playlist of this name already exists, do you wish to override (y/n)? ")
+            override = input("A preset of this name already exists, do you wish to override (y/n)? ")
             if override != "y":
                 print()
                 return
