@@ -1,101 +1,52 @@
-from fragment import wrapper, util
+from fragment import wrapper, util, session
 import sys
 import math
 import random
 from tkinter import *
 
-def run_gui():
-    w = wrapper.SpotifyWrapper()
-    w.create_playlist()
+class FragmentCLI:
+    def __init__(self):
+        self.spotify_wrapper = wrapper.SpotifyWrapper()
+        self.session = session.Session()
+        self.settings()
 
-    # Create tkinter window.
-    root = Tk()
-    root.title("Fragment")
-    root.geometry("500x300")
-    
-    # Set up listbox for playlist selection.
-    playlist_listbox = Listbox(root)
-    playlist_listbox.pack()
-    spotify_playlists = w.get_playlists()
-
-    for playlist in spotify_playlists:
-        name = playlist["name"]
-        if name != "fragment-auto":
-            playlist_listbox.insert(END, name)
-
-    # Set up button to add playlists to the session.
-    add_button = Button(root, text="Add Playlist")
-    add_button.pack()
-
-    # Display window.
-    root.mainloop()
-
-def run_cli():
-    w = wrapper.SpotifyWrapper()
-    w.create_playlist()
-
-    # Get the playlist names that will be a part of the session.
-    util.wrap_with_seperators(" Please enter the playlists you wish to be a part of this session.\n to finish entering playlists, press Enter.")
-    playlists = []
-
-    while (1):
-        playlist = input(" ")
-        if playlist == "":
-            break
-        playlists.append(playlist)
-
-    playlist_count = len(playlists)
-
-    if playlist_count == 0:
-        print(" You must enter at least one playlist!")
-        exit(1)
-
-    # Get the total number of songs for this session.
-    util.print_seperator()
-    song_count = input(" Number of songs for this session: ")
-
-    # Get the percentage each playlist will represent.
-    util.wrap_with_seperators(" Assign a percentage to each playlist.")
-    percentages = [0 for x in range(playlist_count)]
-
-    for i in range(playlist_count):
-        percentages[i] = int(input(" {}: ".format(playlists[i])))
-
-    if (sum(percentages) != 100):
-        util.print_seperator()
-        print(" Error: your sum of percentages does not add up to 100.")
-        sys.exit(1)
+    def settings(self):
+        # First check if user wants to use a preset.
+        do_preset = input("Would you like to load settings from a preset (y/n)? ")
+        if do_preset == "y":
+            preset_name = input("Preset name: ")
+            self.session.load_preset(preset_name)
+            return
         
-    # Calculate the number of songs per playlist.
-    songs_per = [0 for x in range(playlist_count)]
-    for i in range(playlist_count):
-        songs_per[i] = math.floor(float(song_count) * (percentages[i] / 100))
+        # Get the playlist names that will be a part of the session.
+        util.wrap_with_seperators("Please enter the playlists you wish to be a part of this session.\n to finish entering playlists, press Enter.")
+        playlists = []
 
-    # Get the Spotify playlist ids of the chosen playlists.
-    spotify_playlists = w.get_playlists()
-    playlist_ids = ["0" for x in range(playlist_count)]
+        while (1):
+            playlist_name = input(" ")
+            if playlist_name == "":
+                break
+            playlists.append(session.SessionPlaylist(playlist_name, 0))
 
-    for i in range(playlist_count):
-        for j in range(len(spotify_playlists)):
-            if playlists[i].lower() == spotify_playlists[j]["name"].lower():
-                playlist_ids[i] = spotify_playlists[j]["id"]
+        playlist_count = len(playlists)
 
-    # Add random songs from each playlist into fragment-auto.
-    session_track_uris = []
+        if playlist_count == 0:
+            print("You must enter at least one playlist!")
+            return
 
-    for i in range(playlist_count):
-        id = playlist_ids[i]
-        if id == "0":
-            print("No playlist id found for '{}'!".format(playlists[i]))
-            continue
-        tracks = w.get_playlist_tracks(id)
-        for j in range(songs_per[i]):
-            if len(tracks) > 1:
-                random_index = random.randint(0, len(tracks) - 1)
-                session_track_uris.append(tracks[random_index]["track"]["uri"])
-                del tracks[random_index]
+        # Get the percentage each playlist will represent.
+        util.wrap_with_seperators("Assign a frequency to each playlist (1-10).")
+        freq_sum = 0
 
-    for track_uri in session_track_uris:
-        w.add_track(track_uri)
+        for i in range(playlist_count):
+            freq = int(input(" {}: ".format(playlists[i].name)))
+            playlists[i].frequency = freq
+            freq_sum += freq
 
-    w.play_playlist()
+        if (freq_sum != 10):
+            util.print_seperator()
+            print("Error: your sum of frequencies does not add up to 10.")
+            return
+
+        self.session.session_playlists = playlists
+        util.wrap_with_seperators("Session settings successfully changed!")
