@@ -15,7 +15,14 @@ class FragmentCLI:
         do_preset = input("Would you like to load settings from a preset (y/n)? ")
         if do_preset == "y":
             preset_name = input("Preset name: ")
-            self.session.load_preset(preset_name)
+            result = self.session.load_preset(preset_name)
+            util.print_seperator()
+
+            if result == 1:
+                print("Error: preset named '{}' not found!".format(preset_name))
+                return
+            
+            print("Successfully loaded preset '{}'!".format(preset_name))
             return
         
         # Get the playlist names that will be a part of the session.

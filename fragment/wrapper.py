@@ -78,6 +78,7 @@ class CredentialManager:
             authfile = open(".authfile", "r")
             self.user = authfile.readline().rstrip()
             self.access_token = authfile.readline().rstrip()
+            authfile.close()
     
     def authorize(self):
         # Request Spotify username.
