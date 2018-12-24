@@ -1,12 +1,23 @@
 import sys
 import os
 from fragment import util
+import threading
 
 class Session:
     def __init__(self):
         self.session_playlists = []
         self.init_preset_directory()
-
+        self.running = True
+        main_th = threading.Thread(target=self.session_loop)
+        main_th.start()
+        
+    def session_loop(self):
+        # TODO: Where the controlling of the song queue happens.
+        while 1:
+            if not self.running:
+                sys.exit(0)
+            continue
+    
     def init_preset_directory(self):
         if not os.path.isdir("presets"):
             os.makedirs("presets")
@@ -16,14 +27,15 @@ class Session:
             return 1
 
         filename = self.get_preset_filename(name)
-        lines = [line.rstrip("\n") for line in open(filename, "r")]
+        lines = [line.rstrip("\n") for line in open(filename)]
         
         for line in lines:
-            values = line.split()
+            values = line.split(",")
             name = values[0]
             freq = int(values[1])
             session_playlist = SessionPlaylist(name, freq)
-            
+            self.session_playlists.append(session_playlist)
+
         return 0
     
     def save_preset(self, name):
@@ -31,7 +43,7 @@ class Session:
         preset_file = open(filename, "w")
 
         for playlist in self.session_playlists:
-            preset_file.write(playlist.name + " " + str(playlist.frequency))
+            preset_file.write(playlist.name + "," + str(playlist.frequency))
             preset_file.write("\n")
 
         preset_file.close()
@@ -41,7 +53,6 @@ class Session:
 
     def get_preset_filename(self, name):
         return "presets/{}.preset".format(name)
-
 
 class SessionPlaylist:
     def __init__(self, name, frequency):
