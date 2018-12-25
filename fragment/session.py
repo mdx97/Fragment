@@ -1,10 +1,11 @@
+from fragment import wrapper
 import sys
 import os
-from fragment import util
 import threading
 
 class Session:
     def __init__(self):
+        self.spotify_wrapper = wrapper.SpotifyWrapper()
         self.session_playlists = []
         self.init_preset_directory()
         self.running = True
@@ -13,7 +14,7 @@ class Session:
         
     def session_loop(self):
         # TODO: Where the controlling of the song queue happens.
-        while 1:
+        while True:
             if not self.running:
                 sys.exit(0)
             continue

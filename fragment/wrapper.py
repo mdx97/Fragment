@@ -8,28 +8,15 @@ import os.path
 class SpotifyWrapper:
     def __init__(self):
         self.credential_manager = CredentialManager()
-        self.playlist_id = ""
 
-    def create_playlist(self):
-        # Check if fragment-auto playlist exists.
-        playlists = self.get_playlists()
-        playlist_exists = False
-
-        for pl in playlists:
-            if pl["name"] == "fragment-auto":
-                self.playlist_id = pl["id"]
-                playlist_exists = True
-                break
+    def play_tracks(self, track_uris):
+        url = "https://api.spotify.com/v1/me/player/play"
+        headers = self._get_standard_headers()
+        headers["Content-Type"] = "application/json"
+        body = {"uris": track_uris}
+        response = requests.put(url, data=json.dumps(body), headers=headers)
+        print(response.text)
         
-        # Create fragment-auto playlists if it does not exist.
-        if not playlist_exists:
-            url = "https://api.spotify.com/v1/users/{}/playlists".format(self.credential_manager.user)
-            data = {"name": "fragment-auto", "description": "Automatically generated playlist for Fragment."}
-            headers = self._get_standard_headers()
-            headers["Content-Type"] = "application/json"
-            response = requests.post(url, data=json.dumps(data), headers=headers)
-            self.playlist_id = json.loads(response.text)["id"]
-
     def get_playlists(self):
         url = "https://api.spotify.com/v1/users/{}/playlists".format(self.credential_manager.user)
         headers = self._get_standard_headers()
@@ -41,19 +28,6 @@ class SpotifyWrapper:
         headers = self._get_standard_headers()
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["tracks"]["items"]
-    
-    def add_track(self, uri):
-        url = "https://api.spotify.com/v1/playlists/{}/tracks".format(self.playlist_id)
-        headers = self._get_standard_headers()
-        headers["Content-Type"] = "application/json"
-        data = {"uris": [uri]}
-        requests.post(url, data=json.dumps(data), headers=headers)
-
-    def play_playlist(self):
-        url = "https://api.spotify.com/v1/me/player/play"
-        headers = self._get_standard_headers()
-        data = {"context_uri": "spotify:playlist:{}".format(self.playlist_id)}
-        requests.put(url, data=json.dumps(data), headers=headers)
 
     def _get_standard_headers(self):
         return {"Authorization": "Bearer {}".format(self.credential_manager.access_token)}

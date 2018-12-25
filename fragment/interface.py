@@ -1,16 +1,13 @@
-from fragment import wrapper, util, session
+from fragment import session
 import sys
-import math
-import random
 
 class FragmentCLI:
     def __init__(self):
-        self.spotify_wrapper = wrapper.SpotifyWrapper()
         self.session = session.Session()
-        self.cli_loop()
+        self.command_loop()
     
-    def cli_loop(self):
-        while 1:
+    def command_loop(self):
+        while True:
             cmd = input("> ")
             print()
 
