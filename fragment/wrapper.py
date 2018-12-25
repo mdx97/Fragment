@@ -16,18 +16,37 @@ class SpotifyWrapper:
         body = {"uris": track_uris}
         response = requests.put(url, data=json.dumps(body), headers=headers)
         print(response.text)
-        
+    
+    def get_current_track_uri(self):
+        url = "https://api.spotify.com/v1/me/player/currently-playing"
+        headers = self._get_standard_headers()
+        response = requests.get(url, headers=headers)
+        return json.loads(response.text)["item"]["uri"]
+
     def get_playlists(self):
         url = "https://api.spotify.com/v1/users/{}/playlists".format(self.credential_manager.user)
         headers = self._get_standard_headers()
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["items"]
 
+    def get_playlist_track_uris(self, id):
+        data = self.get_playlist_tracks(id)
+        uris = []
+        for track in data:
+            uris.append(track["track"]["uri"])
+        return uris
+    
     def get_playlist_tracks(self, id):
         url = "https://api.spotify.com/v1/playlists/{}".format(id)
         headers = self._get_standard_headers()
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["tracks"]["items"]
+
+    def get_playlist_id_by_name(self, playlist_name):
+        playlists = self.get_playlists()
+        for playlist in playlists:
+            if playlist["name"] == playlist_name:
+                return playlist["id"]
 
     def _get_standard_headers(self):
         return {"Authorization": "Bearer {}".format(self.credential_manager.access_token)}

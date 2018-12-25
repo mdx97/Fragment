@@ -20,6 +20,8 @@ class FragmentCLI:
             elif cmd == "exit":
                 self.session.running = False
                 sys.exit(0)
+            elif cmd == "test":
+                print(self.session.spotify_wrapper.get_playlist_track_uris("2RBGEYnBp04SQaNIhDBEfx"))
             else:
                 print("Error: invalid command '{}'.\n".format(cmd))
     

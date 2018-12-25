@@ -2,6 +2,8 @@ from fragment import wrapper
 import sys
 import os
 import threading
+import random
+import time
 
 class Session:
     def __init__(self):
@@ -11,14 +13,46 @@ class Session:
         self.running = True
         main_th = threading.Thread(target=self.session_loop)
         main_th.start()
-        
+    
     def session_loop(self):
-        # TODO: Where the controlling of the song queue happens.
+        segment_last_track = ""
+        cached_playlists = []
+        playlist_track_uri_cache = []
+
         while True:
             if not self.running:
                 sys.exit(0)
-            continue
-    
+
+            update_queue = False
+
+            # Playlist settings have been updated and the session loop needs to update the URI cache.
+            if self.session_playlists != cached_playlists:
+                update_queue = True
+                cached_playlists = list(self.session_playlists)
+                playlist_track_uri_cache = [[] for x in range(len(cached_playlists))]
+                for idx, session_playlist in enumerate(cached_playlists):
+                    playlist_id = self.spotify_wrapper.get_playlist_id_by_name(session_playlist.name)
+                    playlist_track_uri_cache[idx] = self.spotify_wrapper.get_playlist_track_uris(playlist_id)
+
+            # Check to see if the song queue needs replenished.
+            if segment_last_track == self.spotify_wrapper.get_current_track_uri():
+                update_queue = True
+                
+            if update_queue:
+                tracks = []
+                for idx, sp in enumerate(cached_playlists):
+                    for j in range(sp.frequency):
+                        random_idx = random.randint(0, len(playlist_track_uri_cache[idx]) - 1)
+                        random_track = playlist_track_uri_cache[idx][random_idx]
+                        tracks.append(random_track)
+                        del playlist_track_uri_cache[idx][random_idx]
+                
+                if tracks:
+                    segment_last_track = tracks[-1]
+                    self.spotify_wrapper.play_tracks(tracks)
+
+            time.sleep(1)
+
     def init_preset_directory(self):
         if not os.path.isdir("presets"):
             os.makedirs("presets")
