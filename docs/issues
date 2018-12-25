@@ -2,7 +2,6 @@ Auth
 - Incorporate refresh codes for Spotify API access.
 
 Session controller
-- Should shuffle the tracks before adding them to the queue so that the playlists the tracks come from are more randomized.
 - Issue with polling the current song when there isn't an active device, throws an error.
 - When the queue is replenished when the last song of the queue is playing, it skips the last song in the queue.
 - If the user turns on shuffling in their spotify player, it can cause issues.

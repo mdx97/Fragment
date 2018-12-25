@@ -34,7 +34,7 @@ class Session:
                     playlist_id = self.spotify_wrapper.get_playlist_id_by_name(session_playlist.name)
                     playlist_track_uri_cache[idx] = self.spotify_wrapper.get_playlist_track_uris(playlist_id)
 
-            # Check to see if the song queue needs replenished.
+            # If the song queue is on the last track, the song queue should be updated.
             if segment_last_track == self.spotify_wrapper.get_current_track_uri():
                 update_queue = True
 
