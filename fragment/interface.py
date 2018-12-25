@@ -17,13 +17,13 @@ class FragmentCLI:
                 self.print_settings()
             elif cmd == "saveset":
                 self.save_settings()
+            elif cmd == "help":
+                self.print_help()
             elif cmd == "exit":
                 self.session.running = False
                 sys.exit(0)
-            elif cmd == "test":
-                print(self.session.spotify_wrapper.get_playlist_track_uris("2RBGEYnBp04SQaNIhDBEfx"))
             else:
-                print("Error: invalid command '{}'.\n".format(cmd))
+                print("Error: invalid command. For a list of commands, use 'help'.\n")
     
     def print_settings(self):
         if len(self.session.session_playlists) > 0:
@@ -93,3 +93,11 @@ class FragmentCLI:
 
         self.session.session_playlists = playlists
         print("Session settings successfully changed!\n")
+
+    def print_help(self):
+        print("Available commands\n")
+        print(" set - Allows you to change your current session settings.")
+        print(" viewset - Prints your current session settings.")
+        print(" saveset - Saves the current session settings as a preset.")
+        print(" exit - Exits the application.")
+        print()

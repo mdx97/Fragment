@@ -15,7 +15,6 @@ class SpotifyWrapper:
         headers["Content-Type"] = "application/json"
         body = {"uris": track_uris}
         response = requests.put(url, data=json.dumps(body), headers=headers)
-        print(response.text)
     
     def get_current_track_uri(self):
         url = "https://api.spotify.com/v1/me/player/currently-playing"
