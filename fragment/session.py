@@ -37,7 +37,7 @@ class Session:
             # Check to see if the song queue needs replenished.
             if segment_last_track == self.spotify_wrapper.get_current_track_uri():
                 update_queue = True
-                
+
             if update_queue:
                 tracks = []
                 for idx, sp in enumerate(cached_playlists):
@@ -48,6 +48,7 @@ class Session:
                         del playlist_track_uri_cache[idx][random_idx]
                 
                 if tracks:
+                    random.shuffle(tracks)
                     segment_last_track = tracks[-1]
                     self.spotify_wrapper.play_tracks(tracks)
 
