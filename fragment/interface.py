@@ -4,9 +4,8 @@ import sys
 class FragmentCLI:
     def __init__(self):
         self.session = session.Session()
-        self.command_loop()
     
-    def command_loop(self):
+    def main(self):
         while True:
             cmd = input("> ")
             print()
