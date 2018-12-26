@@ -19,6 +19,10 @@ class FragmentCLI:
                 self.save_settings()
             elif cmd == "help":
                 self.print_help()
+            elif cmd == "test":
+                print(self.session.spotify_wrapper.get_playlists())
+            elif cmd == "refresh":
+                self.session.spotify_wrapper.credential_manager.refresh_credentials()
             elif cmd == "exit":
                 self.session.running = False
                 sys.exit(0)

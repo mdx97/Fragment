@@ -1,5 +1,5 @@
 Auth
-- Incorporate refresh codes for Spotify API access.
+- Need better fallback mechanisms for failed API calls and credential failures.
 
 Session controller
 - Issue with polling the current song when there isn't an active device, throws an error.
