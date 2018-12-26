@@ -4,6 +4,5 @@ Auth
 Session controller
 - Issue with polling the current song when there isn't an active device, throws an error.
 - When the queue is replenished when the last song of the queue is playing, it skips the last song in the queue.
-- If the user turns on shuffling in their spotify player, it can cause issues.
 - Need a way to replenish the uri cache in case it runs out of tracks.
 - Need to verify user inputted playlist names.

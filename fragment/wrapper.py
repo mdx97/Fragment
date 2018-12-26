@@ -14,15 +14,7 @@ class SpotifyWrapper:
     def __init__(self):
         self.credential_manager = CredentialManager()
 
-    # Direct API Functions.
-    def play_tracks(self, track_uris):
-        self._handle_credentials()
-        url = "https://api.spotify.com/v1/me/player/play"
-        headers = self._get_standard_headers()
-        headers["Content-Type"] = "application/json"
-        body = {"uris": track_uris}
-        response = requests.put(url, data=json.dumps(body), headers=headers)
-    
+    # API Functions
     def get_current_track_uri(self):
         self._handle_credentials()
         url = "https://api.spotify.com/v1/me/player/currently-playing"
@@ -43,6 +35,20 @@ class SpotifyWrapper:
         headers = self._get_standard_headers()
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["tracks"]["items"]
+        
+    def play_tracks(self, track_uris):
+        self._handle_credentials()
+        url = "https://api.spotify.com/v1/me/player/play"
+        headers = self._get_standard_headers()
+        headers["Content-Type"] = "application/json"
+        body = {"uris": track_uris}
+        requests.put(url, data=json.dumps(body), headers=headers)
+    
+    def toggle_shuffle_off(self):
+        self._handle_credentials()
+        url = "https://api.spotify.com/v1/me/player/shuffle?state=false"
+        headers = self._get_standard_headers()
+        requests.put(url, headers=headers)
 
     # API Wrapper Functions.
     def get_playlist_id_by_name(self, playlist_name):

@@ -50,6 +50,7 @@ class Controller:
                     if tracks:
                         random.shuffle(tracks)
                         segment_last_track = tracks[-1]
+                        self.spotify_wrapper.toggle_shuffle_off()
                         self.spotify_wrapper.play_tracks(tracks)
 
             time.sleep(1)
