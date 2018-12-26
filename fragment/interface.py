@@ -1,4 +1,4 @@
-from fragment import session
+from fragment import session, presets
 import sys
 
 class FragmentCLI:
@@ -36,13 +36,13 @@ class FragmentCLI:
     
     def save_settings(self):
         preset_name = input("Please enter a name for this preset: ")
-        if self.session.preset_exists(preset_name):
+        if presets.preset_exists(preset_name):
             override = input("A preset of this name already exists, do you wish to override (y/n)? ")
             if override != "y":
                 print()
                 return
         
-        self.session.save_preset(preset_name)
+        presets.save_preset(preset_name, session_playlists)
         print("Preset '{}' successfully saved!\n".format(preset_name))
 
     def settings(self):
@@ -50,11 +50,12 @@ class FragmentCLI:
         do_preset = input("Would you like to load settings from a preset (y/n)? ")
         if do_preset == "y":
             preset_name = input("Preset name: ")
-            result = self.session.load_preset(preset_name)
-            if result == 1:
+            result = presets.get_preset(preset_name)
+            if not result:
                 print("Error: preset named '{}' not found!\n".format(preset_name))
                 return
             
+            self.session.session_playlists = result
             print("Successfully loaded preset '{}'!\n".format(preset_name))
             return
         
