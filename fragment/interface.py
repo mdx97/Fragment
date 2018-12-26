@@ -6,6 +6,7 @@ class FragmentCLI:
         self.controller = controller.Controller()
     
     def main(self):
+        self.authorize()
         while True:
             cmd = input("> ")
             print()
@@ -24,6 +25,17 @@ class FragmentCLI:
             else:
                 print("Error: invalid command. For a list of commands, use 'help'.\n")
     
+    def authorize(self):
+        credential_manager = self.controller.spotify_wrapper.credential_manager
+        if credential_manager.is_authorized():
+            return
+        user = input("Spotify username: ")
+        credential_manager.set_user(user)
+        credential_manager.get_authorization_code()
+
+        authorization_code = input("Please enter the code from the url you were redirected to: ")
+        credential_manager.authorize(authorization_code)
+
     def print_settings(self):
         if len(self.controller.playlist_settings) > 0:
             print("Playlist Settings")
