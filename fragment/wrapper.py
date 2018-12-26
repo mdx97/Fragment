@@ -73,12 +73,54 @@ class SpotifyWrapper:
 
 class CredentialManager:
     def __init__(self):
-        self.config = config.CredentialConfiguration
+        self.config = config.CredentialConfiguration()
+        self.user = ""
         self.access_token = ""
         self.refresh_token = ""
         self.credential_expiration = DateTime.utcnow()
-        self.user = ""
+        self.encoded_id_secret = base64.b64encode(bytes(self.config.SPOTIFY_CLIENT_ID + ":" + self.config.SPOTIFY_CLIENT_SECRET, "utf-8")).decode("ascii")
         self.load_authfile()
+
+    def get_authorization_code(self):
+        authorization_token_request_url = "https://accounts.spotify.com/authorize?response_type=code&client_id=" + self.config.SPOTIFY_CLIENT_ID + "&scope=" + self.config.SPOTIFY_SCOPES + "&redirect_uri=" + self.config.SPOTIFY_REDIRECT_URI
+        webbrowser.open(authorization_token_request_url)
+
+    def authorize(self, authorization_code):
+        self._get_tokens("authorization_code", authorization_code)
+
+    def refresh_credentials(self):
+        self._get_tokens("refresh_token", self.refresh_token)
+
+    def _get_tokens(grant_type, auth_token):
+        request_headers = {"Authorization": "Basic {}".format(self.encoded_id_secret), "Content-Type": "application/x-www-form-urlencoded"}
+        request_body = {"grant_type", grant_type}
+        
+        if grant_type == "authorization_code":
+            request_body["code"] = auth_token
+            request_body["redirect_uri"] = self.config.SPOTIFY_REDIRECT_URI
+            request_body["client_id"] = self.config.SPOTIFY_CLIENT_ID
+        elif grant_type == "refresh_token":
+            request_body["refresh_token"] = auth_token
+
+        response = requests.post("https://accounts.spotify.com/api/token", data=request_body, headers=request_headers)
+        response_data = json.loads(response.text)
+        self.access_token = response_data["access_token"]
+
+        if "refresh_token" in response_data.keys():
+            self.refresh_token = response_data["refresh_token"]
+            
+        self.credential_expiration = DateTime.utcnow() + TimeDelta(seconds=response_data["expires_in"])
+        self.sync_authfile()
+
+    def is_authorized(self):
+        return self.user and self.access_token
+
+    def credentials_expired(self):
+        return DateTime.utcnow() > self.credential_expiration
+
+    def set_user(self, user):
+        self.user = user
+        self.sync_authfile()
 
     def sync_authfile(self):
         authfile = open(".authfile", "w")
@@ -99,43 +141,3 @@ class CredentialManager:
             self.refresh_token = authfile.readline().rstrip()
             self.credential_expiration = DateTime.strptime(authfile.readline().rstrip(), DATETIME_FORMAT)
             authfile.close()
-
-    def refresh_credentials(self):
-        encoded_id_secret = self.generate_secret()
-        request_body = {"grant_type": "refresh_token", "refresh_token": self.refresh_token}
-        request_headers = {"Authorization": "Basic {}".format(encoded_id_secret), "Content-Type": "application/x-www-form-urlencoded"}
-        response = requests.post("https://accounts.spotify.com/api/token", data=request_body, headers=request_headers)
-        response_data = json.loads(response.text)
-        self.access_token = response_data["access_token"]
-        if "refresh_token" in response_data.keys():
-            self.refresh_token = response_data["refresh_token"]
-        self.credential_expiration = DateTime.utcnow() + TimeDelta(seconds=response_data["expires_in"])
-        self.sync_authfile()
-
-    def is_authorized(self):
-        return self.user and self.access_token
-
-    def credentials_expired(self):
-        return DateTime.utcnow() > self.credential_expiration
-
-    def set_user(self, user):
-        self.user = user
-        self.sync_authfile()
-    
-    def get_authorization_code(self):
-        authorization_token_request_url = "https://accounts.spotify.com/authorize?response_type=code&client_id=" + self.config.SPOTIFY_CLIENT_ID + "&scope=" + self.config.SPOTIFY_SCOPES + "&redirect_uri=" + self.config.SPOTIFY_REDIRECT_URI
-        webbrowser.open(authorization_token_request_url)
-    
-    def authorize(self, authorization_code):
-        encoded_id_secret = self.generate_secret()
-        request_body = {"grant_type": "authorization_code", "code": authorization_code, "redirect_uri": self.config.SPOTIFY_REDIRECT_URI, "client_id": self.config.SPOTIFY_CLIENT_ID}
-        request_headers = {"Authorization": "Basic {}".format(encoded_id_secret), "Content-Type": "application/x-www-form-urlencoded"}
-        response = requests.post("https://accounts.spotify.com/api/token", data=request_body, headers=request_headers)
-        response_data = json.loads(response.text)
-        self.access_token = response_data["access_token"]
-        self.refresh_token = response_data["refresh_token"]
-        self.credential_expiration = DateTime.utcnow() + TimeDelta(seconds=response_data["expires_in"])
-        self.sync_authfile()
-    
-    def generate_secret(self):
-        return base64.b64encode(bytes(self.config.SPOTIFY_CLIENT_ID + ":" + self.config.SPOTIFY_CLIENT_SECRET, "utf-8")).decode("ascii")
