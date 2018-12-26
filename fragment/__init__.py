@@ -1,4 +1,4 @@
-from fragment import interface, session
+from fragment import interface
 import sys
 
 cli = interface.FragmentCLI()

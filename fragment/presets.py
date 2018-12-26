@@ -1,4 +1,4 @@
-from fragment import session
+from fragment import controller
 import os
 
 def preset_directory_exists():
@@ -20,8 +20,8 @@ def get_preset(name):
         values = line.split(",")
         name = values[0]
         freq = int(values[1])
-        session_playlist = session.SessionPlaylist(name, freq)
-        playlist_settings.append(session_playlist)
+        setting = controller.PlaylistSetting(name, freq)
+        playlist_settings.append(setting)
 
     return playlist_settings
 
@@ -30,8 +30,8 @@ def save_preset(name, playlist_settings):
     filename = get_preset_filename(name)
     preset_file = open(filename, "w")
 
-    for playlist in playlist_settings:
-        preset_file.write(playlist.name + "," + str(playlist.frequency))
+    for setting in playlist_settings:
+        preset_file.write(setting.name + "," + str(setting.frequency))
         preset_file.write("\n")
 
     preset_file.close()

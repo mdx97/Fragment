@@ -1,9 +1,9 @@
-from fragment import session, presets
+from fragment import controller, presets
 import sys
 
 class FragmentCLI:
     def __init__(self):
-        self.session = session.Session()
+        self.controller = controller.Controller()
     
     def main(self):
         while True:
@@ -19,15 +19,15 @@ class FragmentCLI:
             elif cmd == "help":
                 self.print_help()
             elif cmd == "exit":
-                self.session.running = False
+                self.controller.running = False
                 sys.exit(0)
             else:
                 print("Error: invalid command. For a list of commands, use 'help'.\n")
     
     def print_settings(self):
-        if len(self.session.session_playlists) > 0:
+        if len(self.controller.playlist_settings) > 0:
             print("Playlist Settings")
-            for playlist in self.session.session_playlists:
+            for playlist in self.controller.playlist_settings:
                 print("* {} ({})".format(playlist.name, playlist.frequency))
         else:
             print("No playlist settings!")
@@ -42,7 +42,7 @@ class FragmentCLI:
                 print()
                 return
         
-        presets.save_preset(preset_name, session_playlists)
+        presets.save_preset(preset_name, self.controller.playlist_settings)
         print("Preset '{}' successfully saved!\n".format(preset_name))
 
     def settings(self):
@@ -55,7 +55,7 @@ class FragmentCLI:
                 print("Error: preset named '{}' not found!\n".format(preset_name))
                 return
             
-            self.session.session_playlists = result
+            self.controller.playlist_settings = result
             print("Successfully loaded preset '{}'!\n".format(preset_name))
             return
         
@@ -67,7 +67,7 @@ class FragmentCLI:
             playlist_name = input("> ")
             if playlist_name == "":
                 break
-            playlists.append(session.SessionPlaylist(playlist_name, 0))
+            playlists.append(controller.PlaylistSetting(playlist_name, 0))
 
         print()
         playlist_count = len(playlists)
@@ -91,7 +91,7 @@ class FragmentCLI:
             print("Error: your sum of frequencies does not add up to 10.\n")
             return
 
-        self.session.session_playlists = playlists
+        self.controller.playlist_settings = playlists
         print("Session settings successfully changed!\n")
 
     def print_help(self):

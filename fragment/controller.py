@@ -5,15 +5,15 @@ import threading
 import random
 import time
 
-class Session:
+class Controller:
     def __init__(self):
         self.spotify_wrapper = wrapper.SpotifyWrapper()
-        self.session_playlists = []
+        self.playlist_settings = []
         self.running = True
-        main_th = threading.Thread(target=self.session_loop)
+        main_th = threading.Thread(target=self.main_loop)
         main_th.start()
     
-    def session_loop(self):
+    def main_loop(self):
         segment_last_track = ""
         cached_playlists = []
         playlist_track_uri_cache = []
@@ -24,13 +24,13 @@ class Session:
 
             update_queue = False
 
-            # Playlist settings have been updated and the session loop needs to update the URI cache.
-            if self.session_playlists != cached_playlists:
+            # Playlist settings have been updated and the loop needs to update the URI cache.
+            if self.playlist_settings != cached_playlists:
                 update_queue = True
-                cached_playlists = list(self.session_playlists)
+                cached_playlists = list(self.playlist_settings)
                 playlist_track_uri_cache = [[] for x in range(len(cached_playlists))]
-                for idx, session_playlist in enumerate(cached_playlists):
-                    playlist_id = self.spotify_wrapper.get_playlist_id_by_name(session_playlist.name)
+                for idx, setting in enumerate(cached_playlists):
+                    playlist_id = self.spotify_wrapper.get_playlist_id_by_name(setting.name)
                     playlist_track_uri_cache[idx] = self.spotify_wrapper.get_playlist_track_uris(playlist_id)
 
             # If the song queue is on the last track, the song queue should be updated.
@@ -53,7 +53,7 @@ class Session:
 
             time.sleep(1)
 
-class SessionPlaylist:
+class PlaylistSetting:
     def __init__(self, name, frequency):
         self.name = name
         self.frequency = frequency
