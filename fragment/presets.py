@@ -36,6 +36,9 @@ def save_preset(name, playlist_settings):
 
     preset_file.close()
 
+def get_presets():
+    return [f.split(".")[0] for f in os.listdir("presets")] 
+
 def preset_exists(name):
     if not preset_directory_exists():
         return False

@@ -11,6 +11,7 @@ class Controller:
         self.playlist_settings = []
         self.running = True
         main_th = threading.Thread(target=self.main_loop)
+        main_th.daemon = True
         main_th.start()
     
     def main_loop(self):

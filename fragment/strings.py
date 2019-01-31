@@ -22,13 +22,21 @@ ERROR_NO_SETTINGS = "Error: No playlist settings!\n"
 ERROR_PRESET_NOT_FOUND = "Error: preset not found!\n"
 ERROR_NO_PLAYLISTS_ENTERED = "Error: you must enter at least one playlist!\n"
 ERROR_INVALID_FREQUENCY_SUM = "Error: the sum of the frequencies you entered does not add up to 10!\n"
+ERROR_GUI_NOT_IMPLEMENTED = "Error: GUI not yet implemented!"
 
 # Labels.
 SETTINGS_LABEL = "Playlist Settings"
+PRESETS_LABEL = "Existing Presets"
 
 # Miscellaneous strings.
-HELP_STRING = "Available commands\n set - Allows you to change your current session settings.\n viewset - Prints your current session settings.\n saveset - Saves the current session settings as a preset.\n exit - Exits the application.\n"
+HELP_STRING = "Available commands\n set - Allows you to change your current session settings.\n viewset - Prints your current session settings.\n saveset - Saves the current session settings as a preset.\n presets - Lists all existing presets.\n exit - Exits the application.\n"
 
 # Formatted string functions.
 def playlist_display(name, frequency):
     return "* {} ({})".format(name, frequency)
+
+def preset_display(name):
+    return "* {}".format(name)
+
+def invalid_argument(option):
+    return "Error: invalid argument for {}!\n".format(option)
