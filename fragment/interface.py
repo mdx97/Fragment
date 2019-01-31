@@ -1,14 +1,16 @@
-from fragment import controller, presets
+from fragment.presets import *
+from fragment.controller import Controller, PlaylistSetting
+from fragment.strings import * 
 import sys
 
 class FragmentCLI:
     def __init__(self):
-        self.controller = controller.Controller()
+        self.controller = Controller()
     
     def main(self):
         self.authorize()
         while True:
-            cmd = input("> ")
+            cmd = input(COMMAND_SYMBOL)
             print()
 
             if cmd == "set":
@@ -18,78 +20,78 @@ class FragmentCLI:
             elif cmd == "saveset":
                 self.save_settings()
             elif cmd == "help":
-                self.print_help()
+                print(HELP_STRING) 
             elif cmd == "exit":
                 self.controller.running = False
                 sys.exit(0)
             else:
-                print("Error: invalid command. For a list of commands, use 'help'.\n")
+                print(ERROR_INVALID_COMMAND)
     
     def authorize(self):
         credential_manager = self.controller.spotify_wrapper.credential_manager
         if credential_manager.is_authorized():
             return
-        user = input("Spotify username: ")
+        user = input(USERNAME_PROMPT)
         credential_manager.set_user(user)
         credential_manager.get_authorization_code()
 
-        authorization_code = input("Please enter the code from the url you were redirected to: ")
+        authorization_code = input(AUTHORIZATION_CODE_PROMPT)
         credential_manager.authorize(authorization_code)
 
     def print_settings(self):
         if len(self.controller.playlist_settings) > 0:
-            print("Playlist Settings")
+            print(SETTINGS_LABEL)
             for playlist in self.controller.playlist_settings:
-                print("* {} ({})".format(playlist.name, playlist.frequency))
+                print(playlist_display(playlist.name, playlist.frequency))
         else:
-            print("No playlist settings!")
+            print(ERROR_NO_SETTINGS)
 
         print()
     
     def save_settings(self):
-        preset_name = input("Please enter a name for this preset: ")
-        if presets.preset_exists(preset_name):
-            override = input("A preset of this name already exists, do you wish to override (y/n)? ")
-            if override != "y":
+        preset_name = input(PRESET_PROMPT)
+        if preset_exists(preset_name):
+            override = input(OVERRIDE_PROMPT).lower()
+            if override != YES_SYMBOL:
                 print()
                 return
         
-        presets.save_preset(preset_name, self.controller.playlist_settings)
-        print("Preset '{}' successfully saved!\n".format(preset_name))
+        save_preset(preset_name, self.controller.playlist_settings)
+        print(PRESET_SAVED)
 
     def settings(self):
         # First check if user wants to use a preset.
-        do_preset = input("Would you like to load settings from a preset (y/n)? ")
-        if do_preset == "y":
-            preset_name = input("Preset name: ")
-            result = presets.get_preset(preset_name)
+        do_preset = input(USE_PRESET_PROMPT)
+        if do_preset == YES_SYMBOL:
+            preset_name = input(PRESET_PROMPT)
+            result = get_preset(preset_name)
             if not result:
-                print("Error: preset named '{}' not found!\n".format(preset_name))
+                print(ERROR_PRESET_NOT_FOUND)
                 return
             
             self.controller.playlist_settings = result
-            print("Successfully loaded preset '{}'!\n".format(preset_name))
+            print(PRESET_LOADED)
             return
         
         # Get the playlist names that will be a part of the session.
-        print("Please enter the playlists you wish to be a part of this session.\nTo finish entering playlists, press Enter.")
+        print(PLAYLISTS_PROMPT)
         playlists = []
 
         while (1):
-            playlist_name = input("> ")
-            if playlist_name == "":
+            playlist_name = input(COMMAND_SYMBOL)
+            if not playlist_name:
                 break
-            playlists.append(controller.PlaylistSetting(playlist_name, 0))
+            playlists.append(PlaylistSetting(playlist_name, 0))
 
         print()
         playlist_count = len(playlists)
 
         if playlist_count == 0:
-            print("You must enter at least one playlist!\n")
+            print(ERROR_NO_PLAYLISTS_ENTERED)
             return
 
         # Get the percentage each playlist will represent.
-        print("Assign a frequency to each playlist (1-10).")
+        print(ASSIGN_FREQUENCY_PROMPT)
         freq_sum = 0
 
         for i in range(playlist_count):
@@ -100,16 +102,8 @@ class FragmentCLI:
         print()
 
         if (freq_sum != 10):
-            print("Error: your sum of frequencies does not add up to 10.\n")
+            print(ERROR_INVALID_FREQUENCY_SUM)
             return
 
         self.controller.playlist_settings = playlists
-        print("Session settings successfully changed!\n")
-
-    def print_help(self):
-        print("Available commands\n")
-        print(" set - Allows you to change your current session settings.")
-        print(" viewset - Prints your current session settings.")
-        print(" saveset - Saves the current session settings as a preset.")
-        print(" exit - Exits the application.")
-        print()
+        print(SETTINGS_CHANGED)

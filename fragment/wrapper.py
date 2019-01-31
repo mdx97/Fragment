@@ -91,9 +91,9 @@ class CredentialManager:
     def refresh_credentials(self):
         self._get_tokens("refresh_token", self.refresh_token)
 
-    def _get_tokens(grant_type, auth_token):
+    def _get_tokens(self, grant_type, auth_token):
         request_headers = {"Authorization": "Basic {}".format(self.encoded_id_secret), "Content-Type": "application/x-www-form-urlencoded"}
-        request_body = {"grant_type", grant_type}
+        request_body = {"grant_type": grant_type}
         
         if grant_type == "authorization_code":
             request_body["code"] = auth_token
