@@ -1,4 +1,5 @@
 from fragment.cli import cli_main
+from fragment.gui import gui_main
 from fragment.strings import *
 import sys
 import getopt
@@ -13,8 +14,7 @@ for opt, arg in opts:
 if interface == "cli":
     cli_main()
 elif interface == "gui":
-    print(ERROR_GUI_NOT_IMPLEMENTED)
-    sys.exit(1)
+    gui_main()
 else:
     print(invalid_argument("-i"))
     sys.exit(1)

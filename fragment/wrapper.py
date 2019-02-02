@@ -29,6 +29,10 @@ class SpotifyWrapper:
         response = requests.get(url, headers=headers)
         return json.loads(response.text)["items"]
     
+    def get_playlist_names(self):
+        playlists = self.get_playlists()
+        return [playlist["name"] for playlist in playlists]
+
     def get_playlist_tracks(self, id):
         self._handle_credentials()
         url = "https://api.spotify.com/v1/playlists/{}".format(id)
