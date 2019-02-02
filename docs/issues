@@ -6,3 +6,4 @@ Session controller
 - When the queue is replenished when the last song of the queue is playing, it skips the last song in the queue.
 - Need a way to replenish the uri cache in case it runs out of tracks.
 - Need to verify user inputted playlist names.
+- Refactor so that a class isn't needed for the controller functions. We will just store state in module global vars.
