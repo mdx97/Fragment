@@ -1,3 +1,2 @@
-from fragment.controller import Controller
-g_controller = Controller()
+g_controller = None 
 g_Tkroot = None
