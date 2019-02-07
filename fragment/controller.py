@@ -53,7 +53,7 @@ class Controller:
                         wrapper.toggle_shuffle_off()
                         wrapper.play_tracks(tracks)
 
-            time.sleep(1)
+            time.sleep(5)
 
 class PlaylistSetting:
     def __init__(self, name, frequency):
