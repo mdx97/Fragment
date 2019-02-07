@@ -79,7 +79,7 @@ def settings():
         playlist_name = input(strings.COMMAND_SYMBOL)
         if not playlist_name:
             break
-        playlists.append(PlaylistSetting(playlist_name, 0))
+        playlists.append(controller.PlaylistSetting(playlist_name, 0))
 
     print()
     playlist_count = len(playlists)
