@@ -108,7 +108,7 @@ def settings():
 
 def print_presets():
     print(strings.PRESETS_LABEL)
-    presets = presets.get_presets()
-    for preset in presets:
+    preset_names = presets.get_presets()
+    for preset in preset_names:
         print(strings.preset_display(preset))
     print()
