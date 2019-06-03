@@ -34,6 +34,9 @@ class Controller:
                         playlist_id = wrapper.get_playlist_id_by_name(setting.name)
                         playlist_track_uri_cache[idx] = wrapper.get_playlist_track_uris(playlist_id)
 
+                # Force shuffle to always be disabled.
+                wrapper.toggle_shuffle_off()
+                
                 # If the song queue is on the last track, the song queue should be updated.
                 if segment_last_track == wrapper.get_current_track_uri():
                     update_queue = True
